@@ -11,19 +11,13 @@
 // limitations under the License.
 
 variable "product_family" {
-  description = <<EOF
-    (Required) Name of the product family for which the resource is created.
-    Example: org_name, department_name.
-  EOF
+  description = "Name of the product family for which the resource is created"
   type        = string
   default     = "launch"
 }
 
 variable "product_service" {
-  description = <<EOF
-    (Required) Name of the product service for which the resource is created.
-    For example, backend, frontend, middleware etc.
-  EOF
+  description = "Name of the product service for which the resource is created"
   type        = string
   default     = "signalr"
 }

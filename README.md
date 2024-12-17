@@ -108,8 +108,8 @@ If `make check` target is successful, developer is good to commit the code to pr
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.5.0, <= 1.5.5 |
-| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | ~> 3.113 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | ~> 1.0 |
+| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | ~> 3.117 |
 
 ## Providers
 
@@ -144,13 +144,13 @@ No resources.
 | <a name="input_upstream_endpoint"></a> [upstream\_endpoint](#input\_upstream\_endpoint) | (Optional) The upstream endpoint configuration | <pre>object({<br>    category_pattern = optional(list(string))<br>    event_pattern    = optional(list(string))<br>    hub_pattern      = optional(list(string))<br>    url_template     = optional(string)<br>  })</pre> | `null` | no |
 | <a name="input_network_acl"></a> [network\_acl](#input\_network\_acl) | (Optional) The network ACL configuration | <pre>object({<br>    default_action        = string<br>    allowed_request_types = list(string)<br>  })</pre> | `null` | no |
 | <a name="input_private_endpoints"></a> [private\_endpoints](#input\_private\_endpoints) | (Optional) The private endpoints configuration | <pre>list(object({<br>    private_endpoint_id   = string<br>    allowed_request_types = list(string)<br>  }))</pre> | `[]` | no |
-| <a name="input_resource_names_map"></a> [resource\_names\_map](#input\_resource\_names\_map) | A map of key to resource\_name that will be used by tf-launch-module\_library-resource\_name to generate resource names | <pre>map(object(<br>    {<br>      name       = string<br>      max_length = optional(number, 60)<br>    }<br>  ))</pre> | <pre>{<br>  "resource_group": {<br>    "max_length": 60,<br>    "name": "rg"<br>  },<br>  "signalr": {<br>    "max_length": 60,<br>    "name": "sgnlr"<br>  }<br>}</pre> | no |
-| <a name="input_product_family"></a> [product\_family](#input\_product\_family) | (Required) Name of the product family for which the resource is created.<br>    Example: org\_name, department\_name. | `string` | `"launch"` | no |
-| <a name="input_product_service"></a> [product\_service](#input\_product\_service) | (Required) Name of the product service for which the resource is created.<br>    For example, backend, frontend, middleware etc. | `string` | `"signalr"` | no |
-| <a name="input_environment"></a> [environment](#input\_environment) | Environment in which the resource should be provisioned like dev, qa, prod etc. | `string` | `"dev"` | no |
-| <a name="input_environment_number"></a> [environment\_number](#input\_environment\_number) | The environment count for the respective environment. Defaults to 000. Increments in value of 1 | `string` | `"000"` | no |
-| <a name="input_region"></a> [region](#input\_region) | Azure Region in which the infra needs to be provisioned | `string` | `"eastus"` | no |
-| <a name="input_resource_number"></a> [resource\_number](#input\_resource\_number) | The resource count for the respective resource. Defaults to 000. Increments in value of 1 | `string` | `"000"` | no |
+| <a name="input_resource_names_map"></a> [resource\_names\_map](#input\_resource\_names\_map) | (Optional) A map of key to resource\_name that will be used by tf-launch-module\_library-resource\_name to generate resource names | <pre>map(object(<br>    {<br>      name       = string<br>      max_length = optional(number, 60)<br>    }<br>  ))</pre> | <pre>{<br>  "resource_group": {<br>    "max_length": 60,<br>    "name": "rg"<br>  },<br>  "signalr": {<br>    "max_length": 60,<br>    "name": "sgnlr"<br>  }<br>}</pre> | no |
+| <a name="input_product_family"></a> [product\_family](#input\_product\_family) | (Optional) Name of the product family for which the resource is created | `string` | `"launch"` | no |
+| <a name="input_product_service"></a> [product\_service](#input\_product\_service) | (Optional) Name of the product service for which the resource is created | `string` | `"signalr"` | no |
+| <a name="input_environment"></a> [environment](#input\_environment) | (Optional) Environment in which the resource should be provisioned like dev, qa, prod etc. | `string` | `"dev"` | no |
+| <a name="input_environment_number"></a> [environment\_number](#input\_environment\_number) | (Optional) The environment count for the respective environment. Defaults to 000. Increments in value of 1 | `string` | `"000"` | no |
+| <a name="input_region"></a> [region](#input\_region) | (Optional) Azure Region in which the infra needs to be provisioned | `string` | `"eastus"` | no |
+| <a name="input_resource_number"></a> [resource\_number](#input\_resource\_number) | (Optional) The resource count for the respective resource. Defaults to 000. Increments in value of 1 | `string` | `"000"` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | (Optional) A mapping of tags to assign to the resource. | `map(string)` | `{}` | no |
 
 ## Outputs

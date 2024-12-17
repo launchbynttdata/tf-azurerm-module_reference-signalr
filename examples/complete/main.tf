@@ -35,9 +35,7 @@ module "resource_group" {
 }
 
 module "signalr" {
-  source = "../.."
-  # resource_group_name = module.resource_names["resource_group"].standard
-  # signalr_name        = module.resource_names["signalr"].standard
+  source           = "../.."
   signalr_location = var.region
   tags             = local.tags
   depends_on       = [module.resource_group]
