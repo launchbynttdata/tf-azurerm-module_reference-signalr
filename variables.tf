@@ -11,43 +11,43 @@
 // limitations under the License.
 
 variable "signalr_location" {
-  description = "(Require) Location of the SignalR Service"
+  description = "Location of the SignalR Service"
   type        = string
   nullable    = false
 }
 
 variable "public_network_access_enabled" {
-  description = "(Optional) Indicates whether public network access is allowed"
+  description = "Indicates whether public network access is allowed"
   type        = bool
   default     = true
 }
 
 variable "connectivity_logs_enabled" {
-  description = "(Optional) Indicates whether to enable connectivity logs"
+  description = "Indicates whether to enable connectivity logs"
   type        = bool
   default     = false
 }
 
 variable "http_request_logs_enabled" {
-  description = "(Optional) Indicates whether to enable http request logs"
+  description = "Indicates whether to enable http request logs"
   type        = bool
   default     = false
 }
 
 variable "live_trace_enabled" {
-  description = "(Optional) Indicated whether to enable live traces"
+  description = "Indicated whether to enable live traces"
   type        = bool
   default     = false
 }
 
 variable "messaging_logs_enabled" {
-  description = "(Optional) Indicates whether to enable messaging logs"
+  description = "Indicates whether to enable messaging logs"
   type        = bool
   default     = false
 }
 
 variable "service_mode" {
-  description = "(Optional) The service mode of the SignalR Service"
+  description = "The service mode of the SignalR Service"
   type        = string
   default     = "Default"
 
@@ -58,7 +58,7 @@ variable "service_mode" {
 }
 
 variable "sku_name" {
-  description = "(Optional) The SKU of the SignalR Service"
+  description = "The SKU of the SignalR Service"
   type        = string
   default     = "Free_F1"
   validation {
@@ -68,7 +68,7 @@ variable "sku_name" {
 }
 
 variable "sku_capacity" {
-  description = "(Optional) The capacity of the SKU"
+  description = "The capacity of the SKU"
   type        = number
   default     = 1
   validation {
@@ -86,13 +86,13 @@ variable "sku_capacity" {
 }
 
 variable "cors_allowed_origins" {
-  description = "(Optional) The allowed origins for CORS, separated by comma"
+  description = "The allowed origins for CORS, separated by comma"
   type        = list(string)
   default     = []
 }
 
 variable "upstream_endpoint" {
-  description = "(Optional) The upstream endpoint configuration"
+  description = "The upstream endpoint configuration"
   type = object({
     category_pattern = optional(list(string))
     event_pattern    = optional(list(string))
@@ -103,7 +103,7 @@ variable "upstream_endpoint" {
 }
 
 variable "network_acl" {
-  description = "(Optional) The network ACL configuration"
+  description = "The network ACL configuration"
   type = object({
     default_action        = string
     allowed_request_types = list(string)
@@ -112,7 +112,7 @@ variable "network_acl" {
 }
 
 variable "private_endpoints" {
-  description = "(Optional) The private endpoints configuration"
+  description = "The private endpoints configuration"
   type = list(object({
     private_endpoint_id   = string
     allowed_request_types = list(string)
@@ -121,7 +121,7 @@ variable "private_endpoints" {
 }
 
 variable "resource_names_map" {
-  description = "(Optional) A map of key to resource_name that will be used by tf-launch-module_library-resource_name to generate resource names"
+  description = "A map of key to resource_name that will be used by tf-launch-module_library-resource_name to generate resource names"
   type = map(object(
     {
       name       = string
@@ -137,47 +137,115 @@ variable "resource_names_map" {
       name       = "sgnlr"
       max_length = 60
     }
+    log_analytics_workspace = {
+      name       = "log"
+      max_length = 60
+    }
+    monitor_diagnostic_setting = {
+      name       = "mds"
+      max_length = 60
+    }
   }
 }
 
 variable "product_family" {
-  description = "(Optional) Name of the product family for which the resource is created"
+  description = "Name of the product family for which the resource is created"
   type        = string
   default     = "launch"
 }
 
 variable "product_service" {
-  description = "(Optional) Name of the product service for which the resource is created"
+  description = "Name of the product service for which the resource is created"
   type        = string
   default     = "signalr"
 }
 
 variable "environment" {
-  description = "(Optional) Environment in which the resource should be provisioned like dev, qa, prod etc."
+  description = "Environment in which the resource should be provisioned like dev, qa, prod etc."
   type        = string
   default     = "dev"
 }
 
 variable "environment_number" {
-  description = "(Optional) The environment count for the respective environment. Defaults to 000. Increments in value of 1"
+  description = "The environment count for the respective environment. Defaults to 000. Increments in value of 1"
   type        = string
   default     = "000"
-}
-
-variable "region" {
-  description = "(Optional) Azure Region in which the infra needs to be provisioned"
-  type        = string
-  default     = "eastus"
 }
 
 variable "resource_number" {
-  description = "(Optional) The resource count for the respective resource. Defaults to 000. Increments in value of 1"
+  description = "The resource count for the respective resource. Defaults to 000. Increments in value of 1"
   type        = string
   default     = "000"
 }
 
+variable "use_azure_region_abbr" {
+  description = "Abbreviate the region in the resource names"
+  type        = bool
+  default     = true
+}
+
+variable "enable_log_analytics_workspace" {
+  type    = bool
+  default = false
+}
+
+variable "log_analytics_workspace_sku" {
+  type        = string
+  description = "Specifies the SKU of the Log Analytics Workspace. Possible values are Free, PerNode, Premium, Standard, Standalone, Unlimited, CapacityReservation, and PerGB2018 (new SKU as of 2018-04-03). Defaults to PerGB2018."
+  default     = "Free"
+}
+
+variable "log_analytics_workspace_retention_in_days" {
+  type        = number
+  description = "The workspace data retention in days. Possible values are either 7 (Free Tier only) or range between 30 and 730."
+  default     = "30"
+}
+
+variable "log_analytics_workspace_identity" {
+  type = object({
+    type         = string
+    identity_ids = optional(list(string))
+  })
+  description = "A identity block as defined below."
+  default     = null
+}
+
+variable "log_analytics_workspace_local_authentication_disabled" {
+  type        = bool
+  description = "Boolean flag to specify whether local authentication should be disabled. Defaults to false."
+  default     = false
+}
+
+
+variable "log_analytics_destination_type" {
+  type        = string
+  description = "Specifies the type of destination for the logs. Possible values are 'Dedicated' or 'AzureDiagnostics'."
+  default     = null
+}
+
+variable "enable_monitor_diagnostic_setting" {
+  type    = bool
+  default = false
+}
+
+variable "enabled_log" {
+  type = list(object({
+    category_group = optional(string, "allLogs")
+    category       = optional(string, null)
+  }))
+  default = null
+}
+
+variable "metric" {
+  type = object({
+    category = optional(string)
+    enabled  = optional(bool)
+  })
+  default = null
+}
+
 variable "tags" {
-  description = "(Optional) A mapping of tags to assign to the resource."
+  description = "A mapping of tags to assign to the resource."
   type        = map(string)
   default     = {}
 }

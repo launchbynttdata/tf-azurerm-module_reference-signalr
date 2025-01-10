@@ -12,19 +12,20 @@
 
 module "resource_names" {
   source  = "terraform.registry.launch.nttdata.com/module_library/resource_name/launch"
-  version = "~> 1.0"
+  version = "~> 2.0"
 
   for_each = var.resource_names_map
 
-  region                  = join("", split("-", var.signalr_location))
+  logical_product_family  = var.product_family
+  logical_product_service = var.product_service
+  region                  = var.signalr_location
   class_env               = var.environment
   cloud_resource_type     = each.value.name
   instance_env            = var.environment_number
-  instance_resource       = var.resource_number
   maximum_length          = each.value.max_length
-  logical_product_family  = var.product_family
-  logical_product_service = var.product_service
-  use_azure_region_abbr   = true
+  instance_resource       = var.resource_number
+  use_azure_region_abbr   = var.use_azure_region_abbr
+
 }
 
 module "resource_group" {
@@ -38,11 +39,56 @@ module "resource_group" {
 }
 
 module "signalr" {
+  # TODO replace with published module
+  # source  = "terraform.registry.launch.nttdata.com/module_primitive/signalr/azurerm"
   source = "git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-signalr.git?ref=feature/init"
 
   signalr_location    = var.signalr_location
   resource_group_name = module.resource_group.name
   signalr_name        = module.resource_names["signalr"].standard
-  tags                = merge(var.tags, { resource_name = module.resource_names["signalr"].standard })
-  depends_on          = [module.resource_group]
+
+  public_network_access_enabled = var.public_network_access_enabled
+  connectivity_logs_enabled     = var.connectivity_logs_enabled
+  http_request_logs_enabled     = var.http_request_logs_enabled
+  live_trace_enabled            = var.live_trace_enabled
+  messaging_logs_enabled        = var.messaging_logs_enabled
+  service_mode                  = var.service_mode
+  sku_name                      = var.sku_name
+  sku_capacity                  = var.sku_capacity
+  cors_allowed_origins          = var.cors_allowed_origins
+  upstream_endpoint             = var.upstream_endpoint
+  network_acl                   = var.network_acl
+  private_endpoints             = var.private_endpoints
+
+  tags       = merge(local.tags, { resource_name = module.resource_names["signalr"].standard })
+  depends_on = [module.resource_group]
+}
+
+module "log_analytics_workspace" {
+  for_each = var.enable_log_analytics_workspace == true ? toset(["log_analytics_workspace"]) : []
+  source   = "terraform.registry.launch.nttdata.com/module_primitive/log_analytics_workspace/azurerm"
+  version  = "~> 1.0"
+
+  name                          = module.resource_names["log_analytics_workspace"].standard
+  location                      = var.signalr_location
+  resource_group_name           = module.resource_group.name
+  sku                           = var.log_analytics_workspace_sku
+  retention_in_days             = var.log_analytics_workspace_retention_in_days
+  identity                      = var.log_analytics_workspace_identity
+  local_authentication_disabled = var.log_analytics_workspace_local_authentication_disabled
+
+  depends_on = [module.resource_group]
+}
+
+module "diagnostic_setting" {
+  for_each = var.enable_monitor_diagnostic_setting == true ? toset(["monitor_diagnostic_setting"]) : []
+  source   = "terraform.registry.launch.nttdata.com/module_primitive/monitor_diagnostic_setting/azurerm"
+  version  = "~> 1.0"
+
+  name                           = module.resource_names["monitor_diagnostic_setting"].standard
+  target_resource_id             = module.signalr.signalr_id
+  log_analytics_workspace_id     = module.log_analytics_workspace["log_analytics_workspace"].id
+  log_analytics_destination_type = var.log_analytics_destination_type
+  enabled_log                    = var.enabled_log
+  metric                         = var.metric
 }

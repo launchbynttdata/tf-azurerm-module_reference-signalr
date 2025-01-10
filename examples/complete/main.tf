@@ -10,33 +10,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-module "resource_names" {
-  source  = "terraform.registry.launch.nttdata.com/module_library/resource_name/launch"
-  version = "~> 2.0"
-
-  for_each = var.resource_names_map
-
-  logical_product_family  = var.product_family
-  logical_product_service = var.product_service
-  region                  = var.region
-  class_env               = var.environment
-  cloud_resource_type     = each.value.name
-  instance_env            = var.environment_number
-  maximum_length          = each.value.max_length
-}
-
-module "resource_group" {
-  source  = "terraform.registry.launch.nttdata.com/module_primitive/resource_group/azurerm"
-  version = "~> 1.0"
-
-  name     = module.resource_names["resource_group"].standard
-  location = var.region
-  tags     = local.tags
-}
-
 module "signalr" {
-  source           = "../.."
-  signalr_location = var.region
-  tags             = local.tags
-  depends_on       = [module.resource_group]
+  source = "../.."
+
+  signalr_location     = var.region
+  cors_allowed_origins = ["*"]
+
+  enable_log_analytics_workspace            = true
+  log_analytics_workspace_sku               = var.log_analytics_workspace_sku
+  log_analytics_workspace_retention_in_days = var.log_analytics_workspace_retention_in_days
+  log_analytics_workspace_identity          = var.log_analytics_workspace_identity
+  log_analytics_destination_type            = var.log_analytics_destination_type
+
+  enable_monitor_diagnostic_setting = true
+  enabled_log                       = var.enabled_log
+  metric                            = var.metric
+
+  tags = local.tags
 }

@@ -10,53 +10,56 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-variable "product_family" {
-  description = "Name of the product family for which the resource is created"
-  type        = string
-  default     = "launch"
-}
-
-variable "product_service" {
-  description = "Name of the product service for which the resource is created"
-  type        = string
-  default     = "signalr"
-}
-
-variable "environment" {
-  description = "Environment in which the resource should be provisioned like dev, qa, prod etc."
-  type        = string
-  default     = "dev"
-}
-
-variable "environment_number" {
-  description = "The environment count for the respective environment. Defaults to 000. Increments in value of 1"
-  type        = string
-  default     = "000"
-}
-
 variable "region" {
   description = "Azure Region in which the infra needs to be provisioned"
   type        = string
   default     = "eastus"
 }
 
-variable "resource_names_map" {
-  description = "A map of key to resource_name that will be used by tf-launch-module_library-resource_name to generate resource names"
-  type = map(object(
-    {
-      name       = string
-      max_length = optional(number, 60)
-    }
-  ))
+variable "log_analytics_workspace_sku" {
+  type        = string
+  description = "Specifies the SKU of the Log Analytics Workspace. Possible values are Free, PerNode, Premium, Standard, Standalone, Unlimited, CapacityReservation, and PerGB2018 (new SKU as of 2018-04-03). Defaults to PerGB2018."
+  default     = "PerGB2018"
+}
+
+variable "log_analytics_workspace_retention_in_days" {
+  type        = number
+  description = "The workspace data retention in days. Possible values are either 7 (Free Tier only) or range between 30 and 730."
+  default     = "30"
+}
+
+variable "log_analytics_workspace_identity" {
+  type = object({
+    type         = string
+    identity_ids = optional(list(string))
+  })
+  description = "A identity block as defined below."
+  default     = null
+}
+
+variable "log_analytics_destination_type" {
+  description = "(Optional) Specifies the type of destination for the logs. Possible values are 'Dedicated' or 'AzureDiagnostics'."
+  type        = string
+  default     = "AzureDiagnostics"
+}
+
+variable "enabled_log" {
+  type = list(object({
+    category_group = optional(string, "allLogs")
+    category       = optional(string, null)
+  }))
+  default = [{
+    category_group = "allLogs"
+  }]
+}
+
+variable "metric" {
+  type = object({
+    category = optional(string, "AllMetrics")
+    enabled  = optional(bool, false)
+  })
   default = {
-    resource_group = {
-      name       = "rg"
-      max_length = 60
-    }
-    signalr = {
-      name       = "sgnlr"
-      max_length = 60
-    }
+    category = "AllMetrics"
   }
 }
 
