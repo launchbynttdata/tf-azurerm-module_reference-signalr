@@ -39,10 +39,8 @@ module "resource_group" {
 }
 
 module "signalr" {
-  # TODO replace with published module
-  # source  = "terraform.registry.launch.nttdata.com/module_primitive/signalr/azurerm"
-  # version = "~> 1.0"
-  source = "git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-signalr.git?ref=1.0.0"
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/signalr/azurerm"
+  version = "~> 1.0"
 
   signalr_location    = var.signalr_location
   resource_group_name = module.resource_group.name
