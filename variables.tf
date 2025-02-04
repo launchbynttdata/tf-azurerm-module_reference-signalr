@@ -145,13 +145,13 @@ variable "resource_names_map" {
   }
 }
 
-variable "product_family" {
+variable "logical_product_family" {
   description = "Name of the product family for which the resource is created"
   type        = string
   default     = "launch"
 }
 
-variable "product_service" {
+variable "logical_product_service" {
   description = "Name of the product service for which the resource is created"
   type        = string
   default     = "signalr"

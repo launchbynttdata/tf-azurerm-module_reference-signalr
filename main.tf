@@ -16,8 +16,8 @@ module "resource_names" {
 
   for_each = var.resource_names_map
 
-  logical_product_family  = var.product_family
-  logical_product_service = var.product_service
+  logical_product_family  = var.logical_product_family
+  logical_product_service = var.logical_product_service
   region                  = var.signalr_location
   class_env               = var.environment
   cloud_resource_type     = each.value.name
@@ -75,6 +75,7 @@ module "log_analytics_workspace" {
   retention_in_days             = var.log_analytics_workspace_retention_in_days
   identity                      = var.log_analytics_workspace_identity
   local_authentication_disabled = var.log_analytics_workspace_local_authentication_disabled
+  tags                          = merge(local.tags, { resource_name = module.resource_names["log_analytics_workspace"].standard })
 
   depends_on = [module.resource_group]
 }
