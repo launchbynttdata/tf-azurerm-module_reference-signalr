@@ -35,7 +35,7 @@ variable "http_request_logs_enabled" {
 }
 
 variable "live_trace_enabled" {
-  description = "Indicated whether to enable live traces"
+  description = "Indicates whether to enable live traces"
   type        = bool
   default     = false
 }
@@ -47,34 +47,30 @@ variable "messaging_logs_enabled" {
 }
 
 variable "service_mode" {
-  description = "The service mode of the SignalR Service"
+  description = "The service mode of the SignalR Service. Possible values are Default, Classic, and Serverless"
   type        = string
   default     = "Default"
 
   validation {
     condition     = can(regex("^(Default|Classic|Serverless)$", var.service_mode))
-    error_message = "Invalid service_mode value"
+    error_message = "Invalid `service_mode` value"
   }
 }
 
 variable "sku_name" {
-  description = "The SKU of the SignalR Service"
+  description = "The SKU of the SignalR Service. Possible values are Free_F1, Standard_S1, Premium_P1, and Premium_P2"
   type        = string
   default     = "Free_F1"
   validation {
     condition     = can(regex("^(Free_F1|Standard_S1|Premium_P1|Premium_P2)$", var.sku_name))
-    error_message = "Invalid sku_name value"
+    error_message = "Invalid `sku_name` value"
   }
 }
 
 variable "sku_capacity" {
-  description = "The capacity of the SKU"
+  description = "The capacity of the SKU.  See [the documentation](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/signalr_service#capacity-1) for possible values."
   type        = number
   default     = 1
-  validation {
-    condition     = var.sku_capacity == null || can(regex("^[0-9]$", var.sku_capacity))
-    error_message = "Invalid `sku_capacity` value"
-  }
   validation {
     condition = contains([
       1, 2, 3, 4, 5, 6, 7, 8, 9,
@@ -82,13 +78,14 @@ variable "sku_capacity" {
     100, 200, 300, 400, 500, 600, 700, 800, 900, 1000], var.sku_capacity)
     error_message = "Invalid `sku_capacity` value"
   }
-
 }
 
 variable "cors_allowed_origins" {
-  description = "The allowed origins for CORS, separated by comma"
+  description = <<EOF
+  The allowed origins for CORS, separated by comma. The default is set to ["*"] which will allow all origins
+  EOF
   type        = list(string)
-  default     = []
+  default     = ["*"]
 }
 
 variable "upstream_endpoint" {
@@ -103,7 +100,7 @@ variable "upstream_endpoint" {
 }
 
 variable "network_acl" {
-  description = "The network ACL configuration"
+  description = "The SignalR network ACL configuration"
   type = object({
     default_action        = string
     allowed_request_types = list(string)
@@ -112,7 +109,7 @@ variable "network_acl" {
 }
 
 variable "private_endpoints" {
-  description = "The private endpoints configuration"
+  description = "The private endpoints for the SignalR network ACL"
   type = list(object({
     private_endpoint_id   = string
     allowed_request_types = list(string)
