@@ -25,3 +25,7 @@ output "location" {
 output "resource_group_name" {
   value = module.signalr.resource_group_name
 }
+
+output "metric_alert_id" {
+  value = module.singnal.monitor_metric_alert.id
+}

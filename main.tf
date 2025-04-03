@@ -92,3 +92,59 @@ module "diagnostic_setting" {
   enabled_log                    = var.enabled_log
   metric                         = var.metric
 }
+
+module "metric_alert" {
+  #for_each            = var.metric_alerts.enabled == true ? toset(["monitor_metric_alerts"]) : []
+  source              = "terraform.registry.launch.nttdata.com/module_primitive/monitor_metric_alert/azurerm"
+  version             = "~> 1.1.0"
+  name                = module.resource_names["metric_alert"].standard
+  resource_group_name = module.resource_group.name
+  scopes              = [module.signalr.signalr_id]
+  description         = var.metric_alerts.description
+  frequency           = var.metric_alerts.frequency
+  severity            = var.metric_alerts.severity
+  enabled             = var.metric_alerts.enabled
+  action_group_ids    = module.monitor_action_group.action_group_id
+  webhook_properties  = var.metric_alerts.webhook_properties
+
+  criteria = var.metric_alerts.criterias
+
+  dynamic_criteria = var.metric_alerts.dynamic_criteria
+  depends_on       = [module.resource_group, module.monitor_action_group]
+
+}
+
+module "metric_alert" {
+  for_each = var.enable.metric_alerts == true ? local.metric_alerts : {}
+  source              = "terraform.registry.launch.nttdata.com/module_primitive/monitor_metric_alert/azurerm"
+  version             = "~> 1.1.0"
+  name                = module.resource_names["metric_alerts"].standard
+  resource_group_name = module.resource_group.name
+  scopes              = [module.signalr.signalr_id]
+  description         = each.value.description
+  frequency           = each.value.frequency
+  severity            = each.value.severity
+  enabled             = each.value.enabled
+  action_group_ids    = module.monitor_action_group.action_group_id
+  webhook_properties  = each.value.webhook_properties
+  criteria            = each.value.criteria
+  dynamic_criteria    = each.value.dynamic_criteria
+  depends_on          = [module.resource_group, module.monitor_action_group]
+}
+
+module "monitor_action_group" {
+  for_each = var.monitor_action_groups
+  source   = "terraform.registry.launch.nttdata.com/module_primitive/monitor_action_group/azurerm"
+  version  = "~> 1.0.0"
+
+  action_group_name   = each.value.action_group_name
+  resource_group_name = each.value.resource_group_name
+  short_name          = each.value.short_name
+  tags                = each.value.tags
+  arm_role_receivers  = each.value.arm_role_receivers
+  email_receivers     = each.value.email_receivers
+  depends_on          = [module.resource_group]
+}
+
+
+
