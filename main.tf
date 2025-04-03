@@ -114,23 +114,6 @@ module "metric_alert" {
 
 }
 
-module "metric_alert" {
-  for_each = var.enable.metric_alerts == true ? local.metric_alerts : {}
-  source              = "terraform.registry.launch.nttdata.com/module_primitive/monitor_metric_alert/azurerm"
-  version             = "~> 1.1.0"
-  name                = module.resource_names["metric_alerts"].standard
-  resource_group_name = module.resource_group.name
-  scopes              = [module.signalr.signalr_id]
-  description         = each.value.description
-  frequency           = each.value.frequency
-  severity            = each.value.severity
-  enabled             = each.value.enabled
-  action_group_ids    = module.monitor_action_group.action_group_id
-  webhook_properties  = each.value.webhook_properties
-  criteria            = each.value.criteria
-  dynamic_criteria    = each.value.dynamic_criteria
-  depends_on          = [module.resource_group, module.monitor_action_group]
-}
 
 module "monitor_action_group" {
   for_each = var.monitor_action_groups
@@ -145,6 +128,3 @@ module "monitor_action_group" {
   email_receivers     = each.value.email_receivers
   depends_on          = [module.resource_group]
 }
-
-
-

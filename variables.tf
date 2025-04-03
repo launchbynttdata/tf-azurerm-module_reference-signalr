@@ -295,4 +295,3 @@ variable "monitor_action_groups" {
   }))
   default = {}
 }
-

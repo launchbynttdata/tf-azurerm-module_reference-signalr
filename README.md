@@ -124,6 +124,8 @@ No providers.
 | <a name="module_signalr"></a> [signalr](#module\_signalr) | terraform.registry.launch.nttdata.com/module_primitive/signalr/azurerm | ~> 1.0 |
 | <a name="module_log_analytics_workspace"></a> [log\_analytics\_workspace](#module\_log\_analytics\_workspace) | terraform.registry.launch.nttdata.com/module_primitive/log_analytics_workspace/azurerm | ~> 1.0 |
 | <a name="module_diagnostic_setting"></a> [diagnostic\_setting](#module\_diagnostic\_setting) | terraform.registry.launch.nttdata.com/module_primitive/monitor_diagnostic_setting/azurerm | ~> 1.0 |
+| <a name="module_metric_alert"></a> [metric\_alert](#module\_metric\_alert) | terraform.registry.launch.nttdata.com/module_primitive/monitor_metric_alert/azurerm | ~> 1.1.0 |
+| <a name="module_monitor_action_group"></a> [monitor\_action\_group](#module\_monitor\_action\_group) | terraform.registry.launch.nttdata.com/module_primitive/monitor_action_group/azurerm | ~> 1.0.0 |
 
 ## Resources
 
@@ -163,6 +165,8 @@ No resources.
 | <a name="input_enabled_log"></a> [enabled\_log](#input\_enabled\_log) | n/a | <pre>list(object({<br>    category_group = optional(string, "allLogs")<br>    category       = optional(string, null)<br>  }))</pre> | `null` | no |
 | <a name="input_metric"></a> [metric](#input\_metric) | n/a | <pre>object({<br>    category = optional(string)<br>    enabled  = optional(bool)<br>  })</pre> | `null` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | A mapping of tags to assign to the resource. | `map(string)` | `{}` | no |
+| <a name="input_metric_alerts"></a> [metric\_alerts](#input\_metric\_alerts) | n/a | <pre>map(object({<br>    description   = string<br>    action_groups = optional(set(string))<br><br>    criterias = optional(map(object({<br>      threshold        = number<br>      metric_namespace = string<br>      metric_name      = string<br>      aggregation      = string<br>      operator         = string<br>      dimensions = map(object({<br>        operator = string<br>        values   = list(string)<br>      }))<br>    })))<br><br>    dynamic_criteria = optional(object({<br>      alert_sensitivity = string<br>      metric_name       = string<br>      metric_namespace  = string<br>      aggregation       = string<br>      operator          = string<br>      dimensions = map(object({<br>        operator = string<br>        values   = list(string)<br>      }))<br>    }))<br>  }))</pre> | `{}` | no |
+| <a name="input_monitor_action_groups"></a> [monitor\_action\_groups](#input\_monitor\_action\_groups) | n/a | <pre>map(object({<br>    arm_role_receivers = optional(set(string))<br>    email_receivers    = optional(set(string))<br>  }))</pre> | `{}` | no |
 
 ## Outputs
 
@@ -172,4 +176,5 @@ No resources.
 | <a name="output_signalr_name"></a> [signalr\_name](#output\_signalr\_name) | n/a |
 | <a name="output_location"></a> [location](#output\_location) | n/a |
 | <a name="output_resource_group_name"></a> [resource\_group\_name](#output\_resource\_group\_name) | n/a |
+| <a name="output_metric_alert_id"></a> [metric\_alert\_id](#output\_metric\_alert\_id) | n/a |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->

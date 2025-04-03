@@ -28,4 +28,3 @@ module "signalr" {
 
   tags = local.tags
 }
-
