@@ -68,19 +68,3 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
-
-variable "signalr_configurations" {
-  type = map(object({
-    signalr_location                          = string
-    cors_allowed_origins                      = list(string)
-    enable_log_analytics_workspace            = bool
-    log_analytics_workspace_sku               = string
-    log_analytics_workspace_retention_in_days = number
-    log_analytics_workspace_identity          = string // or object({...}) depending on the structure
-    log_analytics_destination_type            = string
-    enable_monitor_diagnostic_setting         = bool
-    enabled_log                               = list(string) // or map(string) depending on the structure
-    metric                                    = list(string) // or map(string) depending on the structure
-    tags                                      = map(string)
-  }))
-}

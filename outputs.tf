@@ -27,5 +27,13 @@ output "resource_group_name" {
 }
 
 output "metric_alert_id" {
-  value = module.singnal.monitor_metric_alert.id
+  value = {
+    for key, value in module.metric_alert : key => {
+      id   = value.id
+      name = value.name
+    }
+  }
 }
+
+
+

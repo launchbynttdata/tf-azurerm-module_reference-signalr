@@ -288,7 +288,7 @@ variable "metric_alerts" {
 }
 
 
-variable "monitor_action_groups" {
+variable "monitor_action_group" {
   type = map(object({
     arm_role_receivers = optional(set(string))
     email_receivers    = optional(set(string))
