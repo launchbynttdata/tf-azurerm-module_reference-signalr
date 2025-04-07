@@ -34,6 +34,3 @@ output "metric_alert_id" {
     }
   }
 }
-
-
-

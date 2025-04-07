@@ -166,7 +166,7 @@ No resources.
 | <a name="input_metric"></a> [metric](#input\_metric) | n/a | <pre>object({<br>    category = optional(string)<br>    enabled  = optional(bool)<br>  })</pre> | `null` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | A mapping of tags to assign to the resource. | `map(string)` | `{}` | no |
 | <a name="input_metric_alerts"></a> [metric\_alerts](#input\_metric\_alerts) | n/a | <pre>map(object({<br>    description   = string<br>    action_groups = optional(set(string))<br><br>    criterias = optional(map(object({<br>      threshold        = number<br>      metric_namespace = string<br>      metric_name      = string<br>      aggregation      = string<br>      operator         = string<br>      dimensions = map(object({<br>        operator = string<br>        values   = list(string)<br>      }))<br>    })))<br><br>    dynamic_criteria = optional(object({<br>      alert_sensitivity = string<br>      metric_name       = string<br>      metric_namespace  = string<br>      aggregation       = string<br>      operator          = string<br>      dimensions = map(object({<br>        operator = string<br>        values   = list(string)<br>      }))<br>    }))<br>  }))</pre> | `{}` | no |
-| <a name="input_monitor_action_groups"></a> [monitor\_action\_groups](#input\_monitor\_action\_groups) | n/a | <pre>map(object({<br>    arm_role_receivers = optional(set(string))<br>    email_receivers    = optional(set(string))<br>  }))</pre> | `{}` | no |
+| <a name="input_monitor_action_group"></a> [monitor\_action\_group](#input\_monitor\_action\_group) | n/a | <pre>map(object({<br>    arm_role_receivers = optional(set(string))<br>    email_receivers    = optional(set(string))<br>  }))</pre> | `{}` | no |
 
 ## Outputs
 
