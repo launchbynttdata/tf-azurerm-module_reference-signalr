@@ -61,7 +61,7 @@ func TestSignalRExists(t *testing.T, ctx types.TestContext) {
 		metricAlertsMap := terraform.OutputMapOfObjects(t, ctx.TerratestTerraformOptions(), "metric_alerts")
 		var metricAlertsName string
 		for _, v := range metricAlertsMap {
-			metricAlertsName = v.(map[string]string)["name"]
+			metricAlertsName = v.(map[string]interface{})["name"].(string)
 			break // Access the first metric alert and break
 		}
 
