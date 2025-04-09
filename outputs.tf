@@ -26,10 +26,19 @@ output "resource_group_name" {
   value = module.signalr.resource_group_name
 }
 
-output "metric_alert_id" {
+output "metric_alerts" {
   value = {
     for key, value in module.metric_alert : key => {
-      id   = value.id
+      id   = value.metric_alert_id
+      name = value.name
+    }
+  }
+}
+
+output "action_groups" {
+  value = {
+    for key, value in module.action_group : key => {
+      id   = value.action_group_id
       name = value.name
     }
   }

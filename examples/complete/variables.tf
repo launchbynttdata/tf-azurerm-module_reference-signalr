@@ -10,6 +10,46 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+# naming variables
+
+variable "logical_product_family" {
+  description = "Name of the product family for which the resource is created"
+  type        = string
+  default     = "launch"
+}
+
+variable "logical_product_service" {
+  description = "Name of the product service for which the resource is created"
+  type        = string
+  default     = "signalr"
+}
+
+variable "environment" {
+  description = "Environment in which the resource should be provisioned like dev, qa, prod etc."
+  type        = string
+  default     = "dev"
+}
+
+variable "environment_number" {
+  description = "The environment count for the respective environment. Defaults to 000. Increments in value of 1"
+  type        = string
+  default     = "000"
+}
+
+variable "resource_number" {
+  description = "The resource count for the respective resource. Defaults to 000. Increments in value of 1"
+  type        = string
+  default     = "000"
+}
+
+variable "use_azure_region_abbr" {
+  description = "Abbreviate the region in the resource names"
+  type        = bool
+  default     = true
+}
+
+# signalr variables
+
 variable "region" {
   description = "Azure Region in which the infra needs to be provisioned"
   type        = string
@@ -63,6 +103,50 @@ variable "metric" {
   }
 }
 
+variable "metric_alerts" {
+  type = map(object({
+    description        = string
+    action_groups      = optional(set(string), [])
+    enabled            = optional(bool, true)
+    severity           = optional(number, 3)
+    frequency          = optional(string)
+    webhook_properties = optional(map(string))
+
+    criterias = optional(list(object({
+      threshold        = number
+      metric_namespace = string
+      metric_name      = string
+      aggregation      = string
+      operator         = string
+      dimensions = optional(list(object({
+        name     = string
+        operator = string
+        values   = list(string)
+      })))
+    })), [])
+
+    dynamic_criteria = optional(object({
+      alert_sensitivity = string
+      metric_name       = string
+      metric_namespace  = string
+      aggregation       = string
+      operator          = string
+      dimensions = optional(list(object({
+        name     = string
+        operator = string
+        values   = list(string)
+      })))
+    }))
+  }))
+  default = {}
+
+  validation {
+    condition = alltrue(
+      [for alert in var.metric_alerts : !(alert.criterias == null && alert.dynamic_criteria == null)],
+    )
+    error_message = "At least one of 'criteria', 'dynamic_criteria' must be defined for all metric alerts"
+  }
+}
 variable "tags" {
   description = "A mapping of tags to assign to the resource."
   type        = map(string)

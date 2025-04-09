@@ -247,23 +247,27 @@ variable "tags" {
   default     = {}
 }
 
-
 variable "metric_alerts" {
   type = map(object({
-    description   = string
-    action_groups = optional(set(string))
+    description        = string
+    action_groups      = optional(set(string), [])
+    enabled            = optional(bool, true)
+    severity           = optional(number, 3)
+    frequency          = optional(string, "PT1M")
+    webhook_properties = optional(map(string))
 
-    criterias = optional(map(object({
+    criterias = optional(list(object({
       threshold        = number
       metric_namespace = string
       metric_name      = string
       aggregation      = string
       operator         = string
-      dimensions = map(object({
+      dimensions = optional(list(object({
+        name     = string
         operator = string
         values   = list(string)
-      }))
-    })))
+      })))
+    })), [])
 
     dynamic_criteria = optional(object({
       alert_sensitivity = string
@@ -271,10 +275,11 @@ variable "metric_alerts" {
       metric_namespace  = string
       aggregation       = string
       operator          = string
-      dimensions = map(object({
+      dimensions = optional(list(object({
+        name     = string
         operator = string
         values   = list(string)
-      }))
+      })))
     }))
   }))
   default = {}
@@ -287,8 +292,7 @@ variable "metric_alerts" {
   }
 }
 
-
-variable "monitor_action_group" {
+variable "action_groups" {
   type = map(object({
     arm_role_receivers = optional(set(string))
     email_receivers    = optional(set(string))

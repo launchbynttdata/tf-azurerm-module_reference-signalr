@@ -13,6 +13,13 @@
 module "signalr" {
   source = "../.."
 
+  logical_product_family  = var.logical_product_family
+  logical_product_service = var.logical_product_service
+  environment             = var.environment
+  environment_number      = var.environment_number
+  resource_number         = var.resource_number
+  use_azure_region_abbr   = var.use_azure_region_abbr
+
   signalr_location     = var.region
   cors_allowed_origins = ["*"]
 
@@ -25,6 +32,8 @@ module "signalr" {
   enable_monitor_diagnostic_setting = true
   enabled_log                       = var.enabled_log
   metric                            = var.metric
+
+  metric_alerts = var.metric_alerts
 
   tags = local.tags
 }

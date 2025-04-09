@@ -25,3 +25,11 @@ output "location" {
 output "resource_group_name" {
   value = module.signalr.resource_group_name
 }
+
+output "metric_alerts" {
+  value = module.signalr.metric_alerts
+}
+
+output "action_groups" {
+  value = module.signalr.action_groups
+}
