@@ -294,12 +294,10 @@ variable "metric_alerts" {
 
 variable "action_groups" {
   type = map(object({
-    action_group_name   = string
-    resource_group_name = string
-    short_name          = string
-    tags                = optional(map(string), {})
-    arm_role_receivers  = optional(set(string))
-    email_receivers     = optional(set(string))
+    action_group_name  = string
+    short_name         = string
+    arm_role_receivers = optional(set(string))
+    email_receivers    = optional(set(string))
   }))
   default = {}
 }

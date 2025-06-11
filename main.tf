@@ -100,9 +100,9 @@ module "action_group" {
   version  = "~> 1.0.0"
 
   action_group_name   = each.key
-  resource_group_name = each.value.resource_group_name
+  resource_group_name = module.resource_group.name
   short_name          = each.value.short_name
-  tags                = each.value.tags
+  tags                = var.tags
   arm_role_receivers  = each.value.arm_role_receivers
   email_receivers     = each.value.email_receivers
   depends_on          = [module.resource_group]
