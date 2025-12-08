@@ -246,3 +246,90 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+
+variable "action_group" {
+  description = <<EOT
+An action group object. Set to null to skip creation.
+
+Each action group can have:
+- name: (Required) full action group name
+- short_name: (Required) short name used by Azure
+- arm_role_receivers: (Optional) List of ARM role receivers
+- email_receivers: (Optional) List of email receivers
+EOT
+
+  type = object({
+    name       = string
+    short_name = string
+    arm_role_receivers = optional(list(object({
+      name                    = string
+      role_id                 = string
+      use_common_alert_schema = optional(bool)
+    })), [])
+    email_receivers = optional(list(object({
+      name                    = string
+      email_address           = string
+      use_common_alert_schema = optional(bool)
+    })), [])
+  })
+  default = null
+}
+
+variable "action_group_ids" {
+  description = "Explicit list of existing action group IDs (strings) which will be included in alerts."
+  type        = list(string)
+  default     = []
+}
+
+variable "metric_alerts" {
+  description = "Map of metric alerts. Each key is the alert name and the value is an object describing the alert."
+
+  type = map(object({
+    description        = string
+    action_groups      = optional(set(string), [])
+    frequency          = optional(string, "PT1M")
+    severity           = optional(number, 3)
+    enabled            = optional(bool, true)
+    webhook_properties = optional(map(string), {})
+    criteria = optional(list(object({
+      metric_namespace       = string
+      metric_name            = string
+      aggregation            = string
+      operator               = string
+      threshold              = number
+      skip_metric_validation = optional(bool, false)
+      dimensions = optional(list(object({
+        name     = string
+        operator = string
+        values   = list(string)
+      })), [])
+    })), null)
+    dynamic_criteria = optional(object({
+      metric_namespace       = string
+      metric_name            = string
+      aggregation            = string
+      operator               = string
+      alert_sensitivity      = string
+      ignore_data_before     = optional(string)
+      skip_metric_validation = optional(bool, false)
+      dimensions = optional(list(object({
+        name     = string
+        operator = string
+        values   = list(string)
+      })), [])
+    }), null)
+  }))
+  default = {}
+
+  validation {
+    condition = alltrue(
+      [for alert in values(var.metric_alerts) : !(alert.criteria == null && alert.dynamic_criteria == null)]
+    )
+    error_message = "Each metric alert must define at least one of 'criteria' or 'dynamic_criteria'"
+  }
+}
+
+variable "resource_group_name" {
+  description = "Specifies the Name of the Resource Group within which the Private Endpoint should exist."
+  type        = string
+}
