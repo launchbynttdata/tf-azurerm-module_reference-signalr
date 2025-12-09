@@ -96,7 +96,7 @@ module "diagnostic_setting" {
 # Optional: create an action group using your object variable "action_group"
 module "monitor_action_group" {
   source  = "terraform.registry.launch.nttdata.com/module_primitive/monitor_action_group/azurerm"
-  version = "~> 1.0.0"
+  version = "~> 1.0"
 
   count               = var.action_group != null ? 1 : 0
   action_group_name   = var.action_group != null ? var.action_group.name : null
