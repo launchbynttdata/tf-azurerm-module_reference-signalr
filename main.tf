@@ -92,3 +92,48 @@ module "diagnostic_setting" {
   enabled_log                    = var.enabled_log
   metric                         = var.metric
 }
+
+# Optional: create an action group using your object variable "action_group"
+module "monitor_action_group" {
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/monitor_action_group/azurerm"
+  version = "~> 1.0"
+
+  count               = var.action_group != null ? 1 : 0
+  action_group_name   = var.action_group != null ? var.action_group.name : null
+  resource_group_name = coalesce(var.resource_group_name, module.resource_names["resource_group"].standard)
+  short_name          = var.action_group != null ? var.action_group.short_name : null
+  arm_role_receivers  = var.action_group != null ? lookup(var.action_group, "arm_role_receivers", null) : null
+  email_receivers     = var.action_group != null ? lookup(var.action_group, "email_receivers", null) : null
+  tags                = merge(local.tags, var.tags)
+
+  depends_on = [module.resource_group]
+}
+
+# Metric alerts: for_each over the map var.metric_alerts
+module "monitor_metric_alert" {
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/monitor_metric_alert/azurerm"
+  version = "~> 2.0"
+
+  for_each            = var.metric_alerts
+  name                = each.key
+  resource_group_name = coalesce(var.resource_group_name, module.resource_names["resource_group"].standard)
+
+  scopes = [module.signalr.signalr_id]
+
+  description = each.value.description
+  frequency   = each.value.frequency
+  severity    = each.value.severity
+  enabled     = each.value.enabled
+
+  action_group_ids = concat(
+    coalesce(var.action_group_ids, []),
+    try(tolist(each.value.action_groups), []),
+    var.action_group != null ? [module.monitor_action_group[0].action_group_id] : []
+  )
+
+  webhook_properties = lookup(each.value, "webhook_properties", null)
+  criteria           = lookup(each.value, "criteria", null)
+  dynamic_criteria   = lookup(each.value, "dynamic_criteria", null)
+
+  depends_on = [module.signalr]
+}

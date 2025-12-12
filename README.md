@@ -103,7 +103,7 @@ If `make check` target is successful, developer is good to commit the code to pr
 - runs `conftests`. `conftests` make sure `policy` checks are successful.
 - runs `terratest`. This is integration test suit.
 - runs `opa` tests
-<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+<!-- BEGIN_TF_DOCS -->
 ## Requirements
 
 | Name | Version |
@@ -124,6 +124,8 @@ No providers.
 | <a name="module_signalr"></a> [signalr](#module\_signalr) | terraform.registry.launch.nttdata.com/module_primitive/signalr/azurerm | ~> 1.0 |
 | <a name="module_log_analytics_workspace"></a> [log\_analytics\_workspace](#module\_log\_analytics\_workspace) | terraform.registry.launch.nttdata.com/module_primitive/log_analytics_workspace/azurerm | ~> 1.0 |
 | <a name="module_diagnostic_setting"></a> [diagnostic\_setting](#module\_diagnostic\_setting) | terraform.registry.launch.nttdata.com/module_primitive/monitor_diagnostic_setting/azurerm | ~> 1.0 |
+| <a name="module_monitor_action_group"></a> [monitor\_action\_group](#module\_monitor\_action\_group) | terraform.registry.launch.nttdata.com/module_primitive/monitor_action_group/azurerm | ~> 1.0.0 |
+| <a name="module_monitor_metric_alert"></a> [monitor\_metric\_alert](#module\_monitor\_metric\_alert) | terraform.registry.launch.nttdata.com/module_primitive/monitor_metric_alert/azurerm | ~> 2.0 |
 
 ## Resources
 
@@ -163,6 +165,10 @@ No resources.
 | <a name="input_enabled_log"></a> [enabled\_log](#input\_enabled\_log) | n/a | <pre>list(object({<br>    category_group = optional(string, "allLogs")<br>    category       = optional(string, null)<br>  }))</pre> | `null` | no |
 | <a name="input_metric"></a> [metric](#input\_metric) | n/a | <pre>object({<br>    category = optional(string)<br>    enabled  = optional(bool)<br>  })</pre> | `null` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | A mapping of tags to assign to the resource. | `map(string)` | `{}` | no |
+| <a name="input_action_group"></a> [action\_group](#input\_action\_group) | An action group object. Set to null to skip creation.<br><br>Each action group can have:<br>- name: (Required) full action group name<br>- short\_name: (Required) short name used by Azure<br>- arm\_role\_receivers: (Optional) List of ARM role receivers<br>- email\_receivers: (Optional) List of email receivers | <pre>object({<br>    name       = string<br>    short_name = string<br>    arm_role_receivers = optional(list(object({<br>      name                    = string<br>      role_id                 = string<br>      use_common_alert_schema = optional(bool)<br>    })), [])<br>    email_receivers = optional(list(object({<br>      name                    = string<br>      email_address           = string<br>      use_common_alert_schema = optional(bool)<br>    })), [])<br>  })</pre> | `null` | no |
+| <a name="input_action_group_ids"></a> [action\_group\_ids](#input\_action\_group\_ids) | Explicit list of existing action group IDs (strings) which will be included in alerts. | `list(string)` | `[]` | no |
+| <a name="input_metric_alerts"></a> [metric\_alerts](#input\_metric\_alerts) | Map of metric alerts. Each key is the alert name and the value is an object describing the alert. | <pre>map(object({<br>    description        = string<br>    action_groups      = optional(set(string), [])<br>    frequency          = optional(string, "PT1M")<br>    severity           = optional(number, 3)<br>    enabled            = optional(bool, true)<br>    webhook_properties = optional(map(string), {})<br>    criteria = optional(list(object({<br>      metric_namespace       = string<br>      metric_name            = string<br>      aggregation            = string<br>      operator               = string<br>      threshold              = number<br>      skip_metric_validation = optional(bool, false)<br>      dimensions = optional(list(object({<br>        name     = string<br>        operator = string<br>        values   = list(string)<br>      })), [])<br>    })), null)<br>    dynamic_criteria = optional(object({<br>      metric_namespace       = string<br>      metric_name            = string<br>      aggregation            = string<br>      operator               = string<br>      alert_sensitivity      = string<br>      ignore_data_before     = optional(string)<br>      skip_metric_validation = optional(bool, false)<br>      dimensions = optional(list(object({<br>        name     = string<br>        operator = string<br>        values   = list(string)<br>      })), [])<br>    }), null)<br>  }))</pre> | `{}` | no |
+| <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | Specifies the Name of the Resource Group within which the Private Endpoint should exist. | `string` | n/a | yes |
 
 ## Outputs
 
@@ -172,4 +178,4 @@ No resources.
 | <a name="output_signalr_name"></a> [signalr\_name](#output\_signalr\_name) | n/a |
 | <a name="output_location"></a> [location](#output\_location) | n/a |
 | <a name="output_resource_group_name"></a> [resource\_group\_name](#output\_resource\_group\_name) | n/a |
-<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+<!-- END_TF_DOCS -->
