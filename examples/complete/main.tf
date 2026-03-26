@@ -15,6 +15,7 @@ module "signalr" {
 
   signalr_location     = var.region
   cors_allowed_origins = ["*"]
+  sku_name             = var.sku_name
 
   enable_log_analytics_workspace            = true
   log_analytics_workspace_sku               = var.log_analytics_workspace_sku
@@ -25,46 +26,16 @@ module "signalr" {
   enable_monitor_diagnostic_setting         = true
   enabled_log                               = var.enabled_log
   metric                                    = var.metric
+  live_trace_enabled                        = var.live_trace_enabled
+
+  enable_monitor_autoscale_setting = var.enable_monitor_autoscale_setting
+  autoscale_enabled                = var.autoscale_enabled
+  autoscale_profiles               = var.autoscale_profiles
+  autoscale_notification           = var.autoscale_notification
+  autoscale_predictive             = var.autoscale_predictive
+
+  action_group  = var.action_group
+  metric_alerts = var.metric_alerts
 
   tags = local.tags
-}
-
-module "monitor_action_group" {
-  source  = "terraform.registry.launch.nttdata.com/module_primitive/monitor_action_group/azurerm"
-  version = "~> 1.0"
-
-  count               = var.action_group != null ? 1 : 0
-  action_group_name   = var.action_group.name
-  resource_group_name = var.resource_group_name
-  short_name          = var.action_group.short_name
-  arm_role_receivers  = var.action_group.arm_role_receivers
-  email_receivers     = var.action_group.email_receivers
-  tags                = var.tags
-}
-
-#  Metric Alert
-module "monitor_metric_alert" {
-  source  = "terraform.registry.launch.nttdata.com/module_primitive/monitor_metric_alert/azurerm"
-  version = "~> 2.0"
-
-  for_each            = var.metric_alerts
-  name                = each.key
-  resource_group_name = var.resource_group_name
-
-  scopes = [module.signalr.signalr_id]
-
-  description = each.value.description
-  frequency   = each.value.frequency
-  severity    = each.value.severity
-  enabled     = each.value.enabled
-
-  action_group_ids = concat(
-    var.action_group_ids,
-    try(tolist(each.value.action_groups), []),
-    var.action_group != null ? [module.monitor_action_group[0].action_group_id] : []
-  )
-
-  webhook_properties = lookup(each.value, "webhook_properties", null)
-  criteria           = each.value.criteria
-  dynamic_criteria   = each.value.dynamic_criteria
 }

@@ -137,3 +137,25 @@ module "monitor_metric_alert" {
 
   depends_on = [module.signalr]
 }
+
+module "monitor_autoscale_setting" {
+  for_each = var.enable_monitor_autoscale_setting ? toset(["monitor_autoscale_setting"]) : []
+  # source   = "terraform.registry.launch.nttdata.com/module_primitive/monitor_autoscale_setting/azurerm"
+  # version  = "~> 1.0"
+
+  source = "git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-monitor_autoscale_setting.git?ref=main"
+
+  name                = module.resource_names["monitor_autoscale_setting"].standard
+  resource_group_name = coalesce(var.resource_group_name, module.resource_names["resource_group"].standard)
+  location            = var.signalr_location
+  target_resource_id  = module.signalr.signalr_id
+
+  enabled      = var.autoscale_enabled
+  profiles     = var.autoscale_profiles
+  notification = var.autoscale_notification
+  predictive   = var.autoscale_predictive
+
+  tags = merge(local.tags, { resource_name = module.resource_names["monitor_autoscale_setting"].standard })
+
+  depends_on = [module.signalr]
+}

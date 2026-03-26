@@ -25,3 +25,28 @@ output "location" {
 output "resource_group_name" {
   value = module.signalr.resource_group_name
 }
+
+output "autoscale_setting_id" {
+  description = "The ID of the Monitor Autoscale Setting, if created."
+  value       = var.enable_monitor_autoscale_setting ? module.monitor_autoscale_setting["monitor_autoscale_setting"].id : null
+}
+
+output "autoscale_setting_name" {
+  description = "The name of the Monitor Autoscale Setting, if created."
+  value       = var.enable_monitor_autoscale_setting ? module.monitor_autoscale_setting["monitor_autoscale_setting"].name : null
+}
+
+output "action_group_id" {
+  description = "The ID of the Monitor Action Group, if created."
+  value       = var.action_group != null ? module.monitor_action_group[0].action_group_id : null
+}
+
+output "action_group_name" {
+  description = "The name of the Monitor Action Group, if created."
+  value       = var.action_group != null ? module.monitor_action_group[0].action_group_name : null
+}
+
+output "metric_alert_ids" {
+  description = "Map of alert name to resource ID for all created metric alerts."
+  value       = { for k, v in module.monitor_metric_alert : k => v.metric_alert_id }
+}

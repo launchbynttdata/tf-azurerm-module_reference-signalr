@@ -16,6 +16,12 @@ variable "region" {
   default     = "eastus"
 }
 
+variable "sku_name" {
+  description = "The SKU of the SignalR Service. Possible values are Free_F1, Standard_S1, Premium_P1, and Premium_P2."
+  type        = string
+  default     = "Premium_P1"
+}
+
 variable "log_analytics_workspace_sku" {
   type        = string
   description = "Specifies the SKU of the Log Analytics Workspace. Possible values are Free, PerNode, Premium, Standard, Standalone, Unlimited, CapacityReservation, and PerGB2018 (new SKU as of 2018-04-03). Defaults to PerGB2018."
@@ -41,6 +47,12 @@ variable "log_analytics_destination_type" {
   description = "(Optional) Specifies the type of destination for the logs. Possible values are 'Dedicated' or 'AzureDiagnostics'."
   type        = string
   default     = "AzureDiagnostics"
+}
+
+variable "live_trace_enabled" {
+  description = "Indicates whether to enable live traces"
+  type        = bool
+  default     = true
 }
 
 variable "enabled_log" {
@@ -70,13 +82,14 @@ variable "tags" {
 }
 
 variable "resource_group_name" {
-  description = "Test resource group"
+  description = "Override for the resource group name. When null, the reference module generates a name using the resource_names module."
   type        = string
-  default     = "test"
+  default     = null
 }
 
 
 variable "action_group" {
+  description = "Action group to create and attach to metric alerts. Set to null to skip creation."
   type = object({
     name       = string
     short_name = string
@@ -91,34 +104,16 @@ variable "action_group" {
       use_common_alert_schema = optional(bool)
     })), [])
   })
-
-  default = {
-    name       = "ag-test-alerts"
-    short_name = "agtest"
-
-    email_receivers = [
-      {
-        name                    = "oncall"
-        email_address           = "test@example.com"
-        use_common_alert_schema = true
-      }
-    ]
-
-    arm_role_receivers = []
-  }
-}
-
-variable "action_group_ids" {
-  type    = list(string)
-  default = []
+  default = null
 }
 
 variable "metric_alerts" {
+  description = "Map of metric alerts to create, keyed by alert name."
   type = map(object({
     description        = string
     action_groups      = optional(set(string), [])
-    frequency          = optional(string, "PT5M")
-    severity           = optional(number, 2)
+    frequency          = optional(string, "PT1M")
+    severity           = optional(number, 3)
     enabled            = optional(bool, true)
     webhook_properties = optional(map(string), {})
     criteria = optional(list(object({
@@ -149,39 +144,91 @@ variable "metric_alerts" {
       })), [])
     }), null)
   }))
+  default = {}
+}
 
-  default = {
-    "signalr-connections-high" = {
-      description   = "High number of SignalR connections"
-      action_groups = []
+variable "enable_monitor_autoscale_setting" {
+  description = "Whether to create an Azure Monitor Autoscale Setting targeting the SignalR service."
+  type        = bool
+  default     = true
+}
 
-      frequency = "PT5M"
-      severity  = 2
-      enabled   = true
+variable "autoscale_enabled" {
+  description = "Whether automatic scaling is enabled. Defaults to true."
+  type        = bool
+  default     = true
+}
 
-      criteria = [
-        {
-          metric_namespace       = "Microsoft.SignalRService/SignalR"
-          metric_name            = "ConnectionCount"
-          aggregation            = "Maximum"
-          operator               = "GreaterThan"
-          threshold              = 1000
-          skip_metric_validation = false
-          dimensions             = []
-        }
-      ]
+variable "autoscale_profiles" {
+  description = "One or more autoscale profile blocks (up to 20)."
+  type = list(object({
+    name = string
+    capacity = object({
+      default = number
+      maximum = number
+      minimum = number
+    })
+    rules = optional(list(object({
+      metric_trigger = object({
+        metric_name = string
 
-      dynamic_criteria   = null
-      webhook_properties = {}
-    }
-  }
+        operator                 = string
+        statistic                = string
+        time_aggregation         = string
+        time_grain               = string
+        time_window              = string
+        threshold                = number
+        metric_namespace         = optional(string)
+        divide_by_instance_count = optional(bool)
+        dimensions = optional(list(object({
+          name     = string
+          operator = string
+          values   = list(string)
+        })))
+      })
+      scale_action = object({
+        cooldown  = string
+        direction = string
+        type      = string
+        value     = string
+      })
+    })))
+    fixed_date = optional(object({
+      end      = string
+      start    = string
+      timezone = optional(string, "UTC")
+    }))
+    recurrence = optional(object({
+      timezone = optional(string, "UTC")
+      days     = list(string)
+      hours    = list(number)
+      minutes  = list(number)
+    }))
+  }))
+  default = null
+}
 
-  validation {
-    condition = alltrue(
-      [for alert in values(var.metric_alerts) :
-        !(alert.criteria == null && alert.dynamic_criteria == null)
-      ]
-    )
-    error_message = "Each metric alert must define at least one of 'criteria' or 'dynamic_criteria'."
-  }
+variable "autoscale_notification" {
+  description = "Optional notification configuration for autoscale events."
+  type = object({
+    email = optional(object({
+      custom_emails                         = optional(list(string))
+      send_to_subscription_administrator    = optional(bool, false)
+      send_to_subscription_co_administrator = optional(bool, false)
+    }))
+    webhook = optional(list(object({
+      service_uri = string
+      properties  = optional(map(string))
+    })))
+  })
+  default = null
+}
+
+variable "autoscale_predictive" {
+  description = "Optional predictive autoscale configuration."
+  type = object({
+    scale_mode      = string
+    look_ahead_time = optional(string)
+  })
+  default = null
 }
