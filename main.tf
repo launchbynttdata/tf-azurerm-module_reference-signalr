@@ -39,9 +39,8 @@ module "resource_group" {
 }
 
 module "signalr" {
-  # source  = "terraform.registry.launch.nttdata.com/module_primitive/signalr/azurerm"
-  # version = "~> 1.0"
-  source = "git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-signalr.git?ref=fix/autoscaling"
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/signalr/azurerm"
+  version = "~> 1.0"
 
   signalr_location    = var.signalr_location
   resource_group_name = module.resource_group.name
@@ -141,10 +140,8 @@ module "monitor_metric_alert" {
 
 module "monitor_autoscale_setting" {
   for_each = var.enable_monitor_autoscale_setting ? toset(["monitor_autoscale_setting"]) : []
-  # source   = "terraform.registry.launch.nttdata.com/module_primitive/monitor_autoscale_setting/azurerm"
-  # version  = "~> 1.0"
-
-  source = "git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-monitor_autoscale_setting.git?ref=1.0.0"
+  source   = "terraform.registry.launch.nttdata.com/module_primitive/monitor_autoscale_setting/azurerm"
+  version  = "~> 1.0"
 
   name                = module.resource_names["monitor_autoscale_setting"].standard
   resource_group_name = coalesce(var.resource_group_name, module.resource_names["resource_group"].standard)
