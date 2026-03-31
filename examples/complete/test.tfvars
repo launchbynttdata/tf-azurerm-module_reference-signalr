@@ -12,6 +12,8 @@ action_group = {
 
 sku_name = "Premium_P1"
 
+resource_number = "001"
+
 metric_alerts = {
   "high-connection-count" = {
     description = "Alert when SignalR connection count is high"

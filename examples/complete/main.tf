@@ -13,6 +13,12 @@
 module "signalr" {
   source = "../.."
 
+  logical_product_family  = var.logical_product_family
+  logical_product_service = var.logical_product_service
+  environment             = var.environment
+  environment_number      = var.environment_number
+  resource_number         = var.resource_number
+
   signalr_location     = var.region
   cors_allowed_origins = ["*"]
   sku_name             = var.sku_name
