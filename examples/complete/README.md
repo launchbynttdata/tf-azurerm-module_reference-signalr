@@ -55,7 +55,6 @@ No resources.
 | <a name="input_upstream_endpoint"></a> [upstream\_endpoint](#input\_upstream\_endpoint) | The upstream endpoint configuration. | <pre>object({<br/>    category_pattern = optional(list(string))<br/>    event_pattern    = optional(list(string))<br/>    hub_pattern      = optional(list(string))<br/>    url_template     = optional(string)<br/>  })</pre> | `null` | no |
 | <a name="input_network_acl"></a> [network\_acl](#input\_network\_acl) | The SignalR network ACL configuration. | <pre>object({<br/>    default_action        = string<br/>    allowed_request_types = list(string)<br/>  })</pre> | `null` | no |
 | <a name="input_private_endpoints"></a> [private\_endpoints](#input\_private\_endpoints) | Private endpoints for the SignalR network ACL. | <pre>list(object({<br/>    private_endpoint_id   = string<br/>    allowed_request_types = list(string)<br/>  }))</pre> | `[]` | no |
-| <a name="input_resource_names_map"></a> [resource\_names\_map](#input\_resource\_names\_map) | A map of key to resource\_name used for name generation. | <pre>map(object({<br/>    name       = string<br/>    max_length = optional(number, 60)<br/>  }))</pre> | `null` | no |
 
 ## Outputs
 

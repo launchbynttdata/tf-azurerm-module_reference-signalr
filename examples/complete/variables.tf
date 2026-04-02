@@ -321,12 +321,3 @@ variable "private_endpoints" {
   }))
   default = []
 }
-
-variable "resource_names_map" {
-  description = "A map of key to resource_name used for name generation."
-  type = map(object({
-    name       = string
-    max_length = optional(number, 60)
-  }))
-  default = null
-}

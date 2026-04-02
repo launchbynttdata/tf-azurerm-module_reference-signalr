@@ -39,8 +39,6 @@ module "signalr" {
   metric                                    = var.metric
   live_trace_enabled                        = var.live_trace_enabled
 
-  resource_names_map = var.resource_names_map
-
   enable_monitor_autoscale_setting = var.enable_monitor_autoscale_setting
   autoscale_enabled                = var.autoscale_enabled
   autoscale_profiles               = var.autoscale_profiles
