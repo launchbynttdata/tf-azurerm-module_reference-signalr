@@ -48,7 +48,7 @@ func TestSignalRExists(t *testing.T, ctx types.TestContext) {
 			t.Fatalf("failed to finish the request: %v", err)
 		}
 
-		assert.Equal(t, *res.Name, signalrName)
+		assert.Equal(t, signalrName, *res.Name)
 	})
 
 	t.Run("doesAutoscaleSettingExist", func(t *testing.T) {
@@ -69,10 +69,10 @@ func TestSignalRExists(t *testing.T, ctx types.TestContext) {
 			t.Fatalf("failed to get autoscale setting: %v", err)
 		}
 
-		assert.Equal(t, *setting.Name, autoscaleName)
-		assert.Equal(t, *setting.Properties.Enabled, true)
-		assert.Equal(t, len(setting.Properties.Profiles), 1)
-		assert.Equal(t, *setting.Properties.Profiles[0].Name, "defaultProfile")
+		assert.Equal(t, autoscaleName, *setting.Name)
+		assert.Equal(t, true, *setting.Properties.Enabled)
+		assert.Equal(t, 1, len(setting.Properties.Profiles))
+		assert.Equal(t, "defaultProfile", *setting.Properties.Profiles[0].Name)
 	})
 
 	t.Run("doesActionGroupExist", func(t *testing.T) {
@@ -93,7 +93,7 @@ func TestSignalRExists(t *testing.T, ctx types.TestContext) {
 			t.Fatalf("failed to get action group: %v", err)
 		}
 
-		assert.Equal(t, *ag.Name, actionGroupName)
+		assert.Equal(t, actionGroupName, *ag.Name)
 	})
 
 	t.Run("doesMetricAlertExist", func(t *testing.T) {
@@ -114,8 +114,8 @@ func TestSignalRExists(t *testing.T, ctx types.TestContext) {
 			if err != nil {
 				t.Fatalf("failed to get metric alert %q: %v", alertName, err)
 			}
-			assert.Equal(t, *alert.Name, alertName)
-			assert.Equal(t, *alert.Properties.Enabled, true)
+			assert.Equal(t, alertName, *alert.Name)
+			assert.Equal(t, true, *alert.Properties.Enabled)
 		}
 	})
 }

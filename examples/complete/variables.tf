@@ -175,12 +175,24 @@ variable "metric_alerts" {
     }), null)
   }))
   default = {}
+
+  validation {
+    condition = alltrue(
+      [for alert in values(var.metric_alerts) : !(alert.criteria == null && alert.dynamic_criteria == null)]
+    )
+    error_message = "Each metric alert must define at least one of 'criteria' or 'dynamic_criteria'."
+  }
 }
 
 variable "enable_monitor_autoscale_setting" {
   description = "Whether to create an Azure Monitor Autoscale Setting targeting the SignalR service."
   type        = bool
   default     = true
+
+  validation {
+    condition     = var.enable_monitor_autoscale_setting == false || var.autoscale_profiles != null
+    error_message = "autoscale_profiles must be provided when enable_monitor_autoscale_setting is true."
+  }
 }
 
 variable "autoscale_enabled" {
@@ -260,5 +272,61 @@ variable "autoscale_predictive" {
     scale_mode      = string
     look_ahead_time = optional(string)
   })
+  default = null
+}
+
+variable "action_group_ids" {
+  description = "Explicit list of existing action group IDs to attach to alerts."
+  type        = list(string)
+  default     = []
+}
+
+variable "service_mode" {
+  description = "The service mode of the SignalR Service. Possible values are Default, Classic, and Serverless."
+  type        = string
+  default     = "Default"
+}
+
+variable "sku_capacity" {
+  description = "The capacity of the SignalR SKU."
+  type        = number
+  default     = 1
+}
+
+variable "upstream_endpoint" {
+  description = "The upstream endpoint configuration."
+  type = object({
+    category_pattern = optional(list(string))
+    event_pattern    = optional(list(string))
+    hub_pattern      = optional(list(string))
+    url_template     = optional(string)
+  })
+  default = null
+}
+
+variable "network_acl" {
+  description = "The SignalR network ACL configuration."
+  type = object({
+    default_action        = string
+    allowed_request_types = list(string)
+  })
+  default = null
+}
+
+variable "private_endpoints" {
+  description = "Private endpoints for the SignalR network ACL."
+  type = list(object({
+    private_endpoint_id   = string
+    allowed_request_types = list(string)
+  }))
+  default = []
+}
+
+variable "resource_names_map" {
+  description = "A map of key to resource_name used for name generation."
+  type = map(object({
+    name       = string
+    max_length = optional(number, 60)
+  }))
   default = null
 }

@@ -342,6 +342,11 @@ variable "enable_monitor_autoscale_setting" {
   description = "Whether to create an Azure Monitor Autoscale Setting targeting the SignalR service."
   type        = bool
   default     = false
+
+  validation {
+    condition     = var.enable_monitor_autoscale_setting == false || var.autoscale_profiles != null
+    error_message = "autoscale_profiles must be provided when enable_monitor_autoscale_setting is true."
+  }
 }
 
 variable "autoscale_enabled" {
@@ -455,7 +460,7 @@ variable "autoscale_notification" {
 variable "autoscale_predictive" {
   description = <<-EOT
     Optional predictive autoscale configuration.
-    scale_mode      = The predictive scale mode (Disabled, Enabled, ForecastOnly).
+    scale_mode      = The predictive scale mode. Must be Enabled or ForecastOnly. Set autoscale_predictive = null to disable predictive autoscale.
     look_ahead_time = (Optional) Amount of time instances are launched in advance in ISO 8601 format (PT1M to PT1H).
   EOT
   type = object({
@@ -465,7 +470,7 @@ variable "autoscale_predictive" {
   default = null
 
   validation {
-    condition     = var.autoscale_predictive == null ? true : contains(["Disabled", "Enabled", "ForecastOnly"], var.autoscale_predictive.scale_mode)
-    error_message = "autoscale_predictive.scale_mode must be one of: Disabled, Enabled, ForecastOnly."
+    condition     = var.autoscale_predictive == null ? true : contains(["Enabled", "ForecastOnly"], var.autoscale_predictive.scale_mode)
+    error_message = "autoscale_predictive.scale_mode must be one of: Enabled, ForecastOnly. To disable predictive autoscale, set autoscale_predictive = null."
   }
 }

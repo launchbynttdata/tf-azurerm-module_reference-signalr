@@ -154,6 +154,4 @@ module "monitor_autoscale_setting" {
   predictive   = var.autoscale_predictive
 
   tags = merge(local.tags, { resource_name = module.resource_names["monitor_autoscale_setting"].standard })
-
-  depends_on = [module.signalr]
 }

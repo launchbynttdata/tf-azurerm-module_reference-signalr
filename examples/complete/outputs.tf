@@ -41,6 +41,11 @@ output "action_group_name" {
   value       = module.signalr.action_group_name
 }
 
+output "action_group_id" {
+  description = "The ID of the Monitor Action Group, if created."
+  value       = module.signalr.action_group_id
+}
+
 output "metric_alert_ids" {
   description = "Map of metric alert name to resource ID."
   value       = module.signalr.metric_alert_ids

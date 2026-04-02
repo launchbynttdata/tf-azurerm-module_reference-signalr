@@ -22,6 +22,11 @@ module "signalr" {
   signalr_location     = var.region
   cors_allowed_origins = ["*"]
   sku_name             = var.sku_name
+  sku_capacity         = var.sku_capacity
+  service_mode         = var.service_mode
+  upstream_endpoint    = var.upstream_endpoint
+  network_acl          = var.network_acl
+  private_endpoints    = var.private_endpoints
 
   enable_log_analytics_workspace            = true
   log_analytics_workspace_sku               = var.log_analytics_workspace_sku
@@ -34,14 +39,17 @@ module "signalr" {
   metric                                    = var.metric
   live_trace_enabled                        = var.live_trace_enabled
 
+  resource_names_map = var.resource_names_map
+
   enable_monitor_autoscale_setting = var.enable_monitor_autoscale_setting
   autoscale_enabled                = var.autoscale_enabled
   autoscale_profiles               = var.autoscale_profiles
   autoscale_notification           = var.autoscale_notification
   autoscale_predictive             = var.autoscale_predictive
 
-  action_group  = var.action_group
-  metric_alerts = var.metric_alerts
+  action_group     = var.action_group
+  action_group_ids = var.action_group_ids
+  metric_alerts    = var.metric_alerts
 
   tags = local.tags
 }
