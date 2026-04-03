@@ -142,6 +142,10 @@ variable "resource_names_map" {
       name       = "mds"
       max_length = 60
     }
+    monitor_autoscale_setting = {
+      name       = "mas"
+      max_length = 60
+    }
   }
 }
 
@@ -332,4 +336,141 @@ variable "metric_alerts" {
 variable "resource_group_name" {
   description = "Specifies the Name of the Resource Group within which the Private Endpoint should exist."
   type        = string
+}
+
+variable "enable_monitor_autoscale_setting" {
+  description = "Whether to create an Azure Monitor Autoscale Setting targeting the SignalR service."
+  type        = bool
+  default     = false
+
+  validation {
+    condition     = var.enable_monitor_autoscale_setting == false || var.autoscale_profiles != null
+    error_message = "autoscale_profiles must be provided when enable_monitor_autoscale_setting is true."
+  }
+}
+
+variable "autoscale_enabled" {
+  description = "Specifies whether automatic scaling is enabled for the SignalR resource. Defaults to true."
+  type        = bool
+  default     = true
+}
+
+variable "autoscale_profiles" {
+  description = <<-EOT
+    One or more profile blocks (up to 20) defining the autoscale behavior for the SignalR service.
+    name     = Name of the profile.
+    capacity:
+      default  = The number of instances to use if metrics are not available.
+      maximum  = The maximum number of instances (0-1000).
+      minimum  = The minimum number of instances (0-1000).
+    rules = Optional list of scaling rule blocks:
+      metric_trigger:
+        metric_name              = The name of the metric to monitor (e.g. ConnectionCount).
+        operator                 = Comparison operator (Equals, NotEquals, GreaterThan, GreaterThanOrEqual, LessThan, LessThanOrEqual).
+        statistic                = How metrics from multiple instances are combined (Average, Max, Min, Sum).
+        time_aggregation         = How metrics are combined over time_window (Average, Count, Last, Maximum, Minimum, Total).
+        time_grain               = Metric granularity in ISO 8601 duration format (e.g. PT1M).
+        time_window              = Time range for data collection in ISO 8601 duration format (e.g. PT5M).
+        threshold                = Metric threshold that triggers the scale action.
+        metric_namespace         = (Optional) The namespace of the metric.
+        divide_by_instance_count = (Optional) Whether to divide the metric by instance count before comparing.
+        dimensions               = (Optional) List of dimension filter blocks (name, operator, values).
+      scale_action:
+        cooldown  = Time to wait since last scaling action in ISO 8601 format (PT1M to PT1W).
+        direction = Whether to scale Increase or Decrease.
+        type      = Action type (ChangeCount, ExactCount, PercentChangeCount, ServiceAllowedNextValue).
+        value     = Number of instances involved in the scaling action.
+    fixed_date = (Optional) Specific date/time window for this profile (end, start, timezone).
+    recurrence = (Optional) Recurrence configuration (timezone, days, hours, minutes).
+  EOT
+  type = list(object({
+    name = string
+    capacity = object({
+      default = number
+      maximum = number
+      minimum = number
+    })
+    rules = optional(list(object({
+      metric_trigger = object({
+        metric_name              = string
+        operator                 = string
+        statistic                = string
+        time_aggregation         = string
+        time_grain               = string
+        time_window              = string
+        threshold                = number
+        metric_namespace         = optional(string)
+        divide_by_instance_count = optional(bool)
+        dimensions = optional(list(object({
+          name     = string
+          operator = string
+          values   = list(string)
+        })))
+      })
+      scale_action = object({
+        cooldown  = string
+        direction = string
+        type      = string
+        value     = string
+      })
+    })))
+    fixed_date = optional(object({
+      end      = string
+      start    = string
+      timezone = optional(string, "UTC")
+    }))
+    recurrence = optional(object({
+      timezone = optional(string, "UTC")
+      days     = list(string)
+      hours    = list(number)
+      minutes  = list(number)
+    }))
+  }))
+  default = null
+
+  validation {
+    condition     = var.autoscale_profiles == null ? true : (length(var.autoscale_profiles) >= 1 && length(var.autoscale_profiles) <= 20)
+    error_message = "autoscale_profiles must contain between 1 and 20 profiles."
+  }
+}
+
+variable "autoscale_notification" {
+  description = <<-EOT
+    Optional notification configuration for autoscale events.
+    email:
+      custom_emails                         = (Optional) List of custom email addresses to notify.
+      send_to_subscription_administrator    = (Optional) Whether to notify the subscription administrator.
+      send_to_subscription_co_administrator = (Optional) Whether to notify co-administrators.
+    webhook = (Optional) List of webhook blocks (service_uri, properties).
+  EOT
+  type = object({
+    email = optional(object({
+      custom_emails                         = optional(list(string))
+      send_to_subscription_administrator    = optional(bool, false)
+      send_to_subscription_co_administrator = optional(bool, false)
+    }))
+    webhook = optional(list(object({
+      service_uri = string
+      properties  = optional(map(string))
+    })))
+  })
+  default = null
+}
+
+variable "autoscale_predictive" {
+  description = <<-EOT
+    Optional predictive autoscale configuration.
+    scale_mode      = The predictive scale mode. Must be Enabled or ForecastOnly. Set autoscale_predictive = null to disable predictive autoscale.
+    look_ahead_time = (Optional) Amount of time instances are launched in advance in ISO 8601 format (PT1M to PT1H).
+  EOT
+  type = object({
+    scale_mode      = string
+    look_ahead_time = optional(string)
+  })
+  default = null
+
+  validation {
+    condition     = var.autoscale_predictive == null ? true : contains(["Enabled", "ForecastOnly"], var.autoscale_predictive.scale_mode)
+    error_message = "autoscale_predictive.scale_mode must be one of: Enabled, ForecastOnly. To disable predictive autoscale, set autoscale_predictive = null."
+  }
 }
